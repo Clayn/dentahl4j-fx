@@ -27,6 +27,8 @@
                 <version>8.8.3</version>
                 <configuration>
                     <mainClass>${mainClass}</mainClass>
+                    <appName>Dentahl</appName>
+                    <icon>${basedir}/src/main/deploy/package/windows/Dentahl.ico</icon>
                 </configuration>
             </plugin>
             <plugin>

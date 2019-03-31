@@ -199,6 +199,11 @@ public class MainWindowController implements Initializable
     @FXML
     private void onNewTeam()
     {
+        if (teamList.getSelectionModel().getSelectedItem() == null)
+        {
+            onClear();
+            return;
+        }
         teamList.getSelectionModel().clearSelection();
     }
 }
