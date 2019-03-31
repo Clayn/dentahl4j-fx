@@ -33,6 +33,7 @@ import javafx.collections.ObservableMap;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.image.Image;
 import net.bplaced.clayn.d4j.domain.Ninja;
+import net.bplaced.clayn.d4j.fx.custom.FXTeam;
 
 /**
  *
@@ -48,6 +49,7 @@ public class DomainData
     private final ReadOnlyIntegerWrapper minimumId = new ReadOnlyIntegerWrapper(
             -1);
     private final ReadOnlyIntegerWrapper maxId = new ReadOnlyIntegerWrapper(-1);
+    private final ObservableList<FXTeam> teams = FXCollections.observableArrayList();
 
     public int getMaxId()
     {
@@ -110,6 +112,11 @@ public class DomainData
         }
         return ninjas.stream().filter((nin) -> nin.getId() == id).findFirst().orElse(
                 null);
+    }
+
+    public ObservableList<FXTeam> getTeams()
+    {
+        return teams;
     }
 
 }

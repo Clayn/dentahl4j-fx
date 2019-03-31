@@ -1,11 +1,15 @@
 package net.bplaced.clayn.d4j.fx;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -13,15 +17,19 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import kong.unirest.Unirest;
+import net.bplaced.clayn.d4j.api.TeamEndpoint;
 import net.bplaced.clayn.d4j.data.DomainData;
 import net.bplaced.clayn.d4j.domain.Element;
 import net.bplaced.clayn.d4j.domain.Ninja;
+import net.bplaced.clayn.d4j.domain.Team;
+import net.bplaced.clayn.d4j.fx.custom.FXTeam;
 import net.bplaced.clayn.d4j.fx.custom.NinjaView;
 import net.bplaced.clayn.d4j.fx.custom.TeamView;
 
@@ -38,12 +46,47 @@ public class MainWindowController implements Initializable
     private ChoiceBox<Element> elementFilter;
     @FXML
     private VBox center;
+    @FXML
+    private ChoiceBox<FXTeam> teamList;
+    @FXML
+    private MenuItem clearMenu;
     private TeamView team = new TeamView();
     private final Map<Ninja, Node> ninjaNodes = new HashMap<>();
 
     @Override
     public void initialize(URL url, ResourceBundle rb)
     {
+        clearMenu.disableProperty().bind(
+                teamList.getSelectionModel().selectedItemProperty().isNotNull());
+        teamList.setItems(DomainData.getInstance().getTeams());
+        teamList.setConverter(new StringConverter<FXTeam>()
+        {
+            @Override
+            public String toString(FXTeam object)
+            {
+                return object == null ? "" : object.getName() + "\n(" + object.getDescription() + ")";
+            }
+
+            @Override
+            public FXTeam fromString(String string)
+            {
+                if ((string == null || string.isEmpty()))
+                {
+                    return null;
+                }
+                for (FXTeam team : teamList.getItems())
+                {
+                    if (string.startsWith(team.getName()))
+                    {
+                        return team;
+                    }
+                }
+                return null;
+            }
+        });
+
+        team.teamProperty().bind(
+                teamList.getSelectionModel().selectedItemProperty());
         center.getChildren().add(0, team);
         scroll.getChildrenUnmodifiable().addListener(
                 new ListChangeListener<Node>()
@@ -125,6 +168,19 @@ public class MainWindowController implements Initializable
                 ninjaPane.getChildren().addAll(nodes);
             }
         });
+        try
+        {
+            List<Team> teams = new TeamEndpoint(
+                    "http://clayn.bplaced.net/dentahl").getTeams(
+                    DomainData.getInstance().getNinjas());
+            DomainData.getInstance().getTeams().addAll(teams.stream().map(
+                    FXTeam::fromDomainTeam).collect(Collectors.toList()));
+        } catch (IOException ex)
+        {
+            Logger.getLogger(MainWindowController.class.getName()).log(
+                    Level.SEVERE,
+                    null, ex);
+        }
     }
 
     @FXML
@@ -138,5 +194,11 @@ public class MainWindowController implements Initializable
     private void onClear()
     {
         team.clear();
+    }
+
+    @FXML
+    private void onNewTeam()
+    {
+        teamList.getSelectionModel().clearSelection();
     }
 }
