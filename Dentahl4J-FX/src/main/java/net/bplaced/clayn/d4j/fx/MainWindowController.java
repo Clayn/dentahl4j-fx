@@ -109,6 +109,7 @@ public class MainWindowController implements Initializable
                 for (Ninja n : DomainData.getInstance().getSortedNinjas())
                 {
                     NinjaView view = new NinjaView();
+
                     if (elementFilter.getValue() != null)
                     {
                         if (n.getElementType() != elementFilter.getValue())

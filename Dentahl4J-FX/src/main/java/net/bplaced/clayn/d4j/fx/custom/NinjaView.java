@@ -25,6 +25,8 @@ package net.bplaced.clayn.d4j.fx.custom;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Control;
@@ -40,6 +42,23 @@ public class NinjaView extends Control
 
     private final IntegerProperty xPosition = new SimpleIntegerProperty(-1);
     private final IntegerProperty yPosition = new SimpleIntegerProperty(-1);
+    private final ReadOnlyBooleanWrapper dragable = new ReadOnlyBooleanWrapper(
+            true);
+
+    public boolean isDragable()
+    {
+        return dragable.get();
+    }
+
+    ReadOnlyBooleanWrapper dragableAccessProperty()
+    {
+        return dragable;
+    }
+
+    public ReadOnlyBooleanProperty dragableProperty()
+    {
+        return dragable.getReadOnlyProperty();
+    }
 
     public int getYPosition()
     {

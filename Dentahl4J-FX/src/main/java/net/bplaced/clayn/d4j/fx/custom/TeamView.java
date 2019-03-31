@@ -15,6 +15,22 @@ public class TeamView extends Control
 {
 
     private final ObjectProperty<Runnable> onClear = new SimpleObjectProperty<>();
+    private final ObjectProperty<FXTeam> team = new SimpleObjectProperty<>(null);
+
+    public FXTeam getTeam()
+    {
+        return team.get();
+    }
+
+    public void setTeam(FXTeam value)
+    {
+        team.set(value);
+    }
+
+    public ObjectProperty<FXTeam> teamProperty()
+    {
+        return team;
+    }
 
     Runnable getOnClear()
     {
@@ -31,17 +47,10 @@ public class TeamView extends Control
         return onClear;
     }
 
-    private final FXTeam team = new FXTeam();
-
     @Override
     protected Skin<?> createDefaultSkin()
     {
         return new TeamViewSkin(this);
-    }
-
-    public FXTeam getTeam()
-    {
-        return team;
     }
 
     public void clear()

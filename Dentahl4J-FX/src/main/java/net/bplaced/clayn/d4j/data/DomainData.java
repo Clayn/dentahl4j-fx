@@ -24,6 +24,9 @@
 package net.bplaced.clayn.d4j.data;
 
 import java.util.Comparator;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -42,12 +45,41 @@ public class DomainData
     private final ObservableList<Ninja> ninjas = FXCollections.observableArrayList();
     private final SortedList<Ninja> sortedNinjas = new SortedList<>(ninjas);
     private final ObservableMap<Ninja, Image> ninjaImages = FXCollections.observableHashMap();
+    private final ReadOnlyIntegerWrapper minimumId = new ReadOnlyIntegerWrapper(
+            -1);
+    private final ReadOnlyIntegerWrapper maxId = new ReadOnlyIntegerWrapper(-1);
+
+    public int getMaxId()
+    {
+        return maxId.get();
+    }
+
+    public ReadOnlyIntegerProperty maxIdProperty()
+    {
+        return maxId.getReadOnlyProperty();
+    }
+
+    public int getMinimumId()
+    {
+        return minimumId.get();
+    }
+
+    public ReadOnlyIntegerProperty minimumIdProperty()
+    {
+        return minimumId.getReadOnlyProperty();
+    }
 
     private DomainData()
     {
         sortedNinjas.setComparator(
                 Comparator.comparingInt(Ninja::getMain).reversed().thenComparingInt(
                         Ninja::getId));
+        minimumId.bind(Bindings.createIntegerBinding(
+                () -> ninjas.stream().mapToInt(Ninja::getId).min().orElse(-1),
+                ninjas));
+        maxId.bind(Bindings.createIntegerBinding(
+                () -> ninjas.stream().mapToInt(Ninja::getId).max().orElse(-1),
+                ninjas));
     }
 
     public static DomainData getInstance()
@@ -68,6 +100,16 @@ public class DomainData
     public ObservableMap<Ninja, Image> getNinjaImages()
     {
         return ninjaImages;
+    }
+
+    public Ninja getNinja(long id)
+    {
+        if (id < minimumId.get() || id > maxId.get())
+        {
+            return null;
+        }
+        return ninjas.stream().filter((nin) -> nin.getId() == id).findFirst().orElse(
+                null);
     }
 
 }

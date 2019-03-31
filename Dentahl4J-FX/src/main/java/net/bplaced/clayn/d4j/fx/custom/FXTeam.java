@@ -22,4 +22,14 @@ public class FXTeam extends Team
         return positions;
     }
 
+    public static FXTeam fromDomainTeam(Team t)
+    {
+        FXTeam team = new FXTeam();
+        team.setDescription(t.getDescription());
+        team.setName(t.getName());
+        team.setId(t.getId());
+        team.getPositions().putAll(t.getPositions());
+        return team;
+    }
+
 }
